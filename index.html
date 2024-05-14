@@ -1,13 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>My first three.js app</title>
-		<style>
-			body { margin: 0; }
-		</style>
+
+	<title>11</title>
+	<style>
+		body {
+			margin: 0;
+			overflow: hidden;
+			/* 隐藏body窗口区域滚动条 */
+		}
+	</style>
+	<!--引入three.js三维引擎-->
+	<script src="./11/three.js"></script>
+	<script src="./11/stats.js"></script>
+	<!-- 引入threejs扩展控件OrbitControls.js -->
+	<script src="./11/OrbitControls.js"></script>
+	<script src="./11/WebGL.js"></script>
+	<!-- <script src="./11/STLLoader.js"></script> -->
 	</head>
-	<body>
-		<script type="module" src="/main.js"></script>
+
+	<body id="body">
+			<div id="container"></div>
+		
+		<script type="module" src="./main.js"></script>
+	
+		<!-- </div><canvas width="1280" height="800" style="width: 1280px; height: 800px;"></canvas> -->
+
 	</body>
 </html>
