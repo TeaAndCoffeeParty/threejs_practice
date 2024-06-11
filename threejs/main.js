@@ -3,6 +3,10 @@ import * as THREE from 'three';
 function render(time, cubes, scene, camera, renderer) {
 	time = performance.now() * 0.001;
 
+	const canvas = renderer.domElement;
+	camera.aspect = canvas.clientWidth / canvas.clientHeight;
+	camera.updateProjectionMatrix();
+
 	cubes.forEach((cube, ndx) => {
 		const speed = 1 + ndx * 0.1;
 		const rot = time *speed;
