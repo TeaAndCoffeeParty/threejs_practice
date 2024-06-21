@@ -1,40 +1,86 @@
 import * as THREE from 'three';
 
 function main() {
-	// 创建场景
+	const canvas = document.querySelector( '#c' );
+	const renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+
+
+	const fov = 40;
+	const aspect = 2; // the canvas default
+	const near = 0.1;
+	const far = 1000;
+	const camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.position.set( 0, 50, 0 );
+	camera.up.set( 0, 0, 1 );
+	camera.lookAt( 0, 0, 0 );
+
 	const scene = new THREE.Scene();
 
-	// 创建相机
-	const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-	camera.position.z = 5;
+	{
 
-	// 创建渲染器并添加到HTML中
-	const renderer = new THREE.WebGLRenderer();
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.appendChild(renderer.domElement);
+		const color = 0xFFFFFF;
+		const intensity = 500;
+		const light = new THREE.PointLight( color, intensity );
+		scene.add( light );
 
-	// 创建一个几何体和材质
-	const geometry = new THREE.BoxGeometry();
-	const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-
-	// 创建一个网格并添加到场景中
-	const cube = new THREE.Mesh(geometry, material);
-	scene.add(cube);
-
-	// 渲染场景
-	function render() {
-		requestAnimationFrame(render);
-
-		// 旋转网格
-		cube.rotation.x += 0.01;
-		cube.rotation.y += 0.01;
-
-		// 渲染
-		renderer.render(scene, camera);
 	}
 
-	// 开始渲染循环
-	render();
+	// an array of objects who's rotation to update
+	const objects = [];
+
+	const radius = 1;
+	const widthSegments = 6;
+	const heightSegments = 6;
+	const sphereGeometry = new THREE.SphereGeometry(
+		radius, widthSegments, heightSegments );
+
+	const sunMaterial = new THREE.MeshPhongMaterial( { emissive: 0xFFFF00 } );
+	const sunMesh = new THREE.Mesh( sphereGeometry, sunMaterial );
+	sunMesh.scale.set( 5, 5, 5 );
+	scene.add( sunMesh );
+	objects.push( sunMesh );
+
+	function resizeRendererToDisplaySize( renderer ) {
+
+		const canvas = renderer.domElement;
+		const width = canvas.clientWidth;
+		const height = canvas.clientHeight;
+		const needResize = canvas.width !== width || canvas.height !== height;
+		if ( needResize ) {
+
+			renderer.setSize( width, height, false );
+
+		}
+
+		return needResize;
+
+	}
+
+	function render( time ) {
+
+		time *= 0.001;
+
+		if ( resizeRendererToDisplaySize( renderer ) ) {
+
+			const canvas = renderer.domElement;
+			camera.aspect = canvas.clientWidth / canvas.clientHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		objects.forEach( ( obj ) => {
+
+			obj.rotation.y = time;
+
+		} );
+
+		renderer.render( scene, camera );
+
+		requestAnimationFrame( render );
+
+	}
+
+	requestAnimationFrame( render );
 }
 
 main()
