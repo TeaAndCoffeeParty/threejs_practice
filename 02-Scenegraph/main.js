@@ -34,21 +34,35 @@ function main() {
 	const sphereGeometry = new THREE.SphereGeometry(
 		radius, widthSegments, heightSegments );
 
+	const earthOrbit = new THREE.Object3D();
+	earthOrbit.position.x = 10;
 	const solarSystem = new THREE.Object3D();
+	solarSystem.add(earthOrbit)
 	scene.add(solarSystem);
 	objects.push(solarSystem);
+	objects.push(earthOrbit);
+
 
 	const sunMaterial = new THREE.MeshPhongMaterial( { emissive: 0xFFFF00 } );
 	const sunMesh = new THREE.Mesh( sphereGeometry, sunMaterial );
 	sunMesh.scale.set( 5, 5, 5 );
 	solarSystem.add( sunMesh );
-	objects.push( sunMesh );
+	objects.push(sunMesh);
 
 	const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
 	const earthMesh = new THREE.Mesh(sphereGeometry, earthMaterial);
-	earthMesh.position.x = 10;
-	solarSystem.add(earthMesh);
+	earthOrbit.add(earthMesh);
 	objects.push(earthMesh);
+
+	const moonOrbit = new THREE.Object3D();
+	moonOrbit.position.x = 2;
+	earthOrbit.add(moonOrbit);
+
+	const moonMaterial = new THREE.MeshPhongMaterial( {color: 0x888888, emissive: 0x222222 });
+	const moonMesh = new THREE.Mesh(sphereGeometry, moonMaterial);
+	moonMesh.scale.set( 0.5, 0.5, 0.5 );
+	moonOrbit.add(moonMesh);
+	objects.push(moonMesh);
 
 	function resizeRendererToDisplaySize( renderer ) {
 
@@ -57,40 +71,29 @@ function main() {
 		const height = canvas.clientHeight;
 		const needResize = canvas.width !== width || canvas.height !== height;
 		if ( needResize ) {
-
 			renderer.setSize( width, height, false );
-
 		}
 
 		return needResize;
-
 	}
 
-	function render( time ) {
-
+	function render(time) {
 		time *= 0.001;
-
-		if ( resizeRendererToDisplaySize( renderer ) ) {
-
+		if ( resizeRendererToDisplaySize(renderer) ) {
 			const canvas = renderer.domElement;
 			camera.aspect = canvas.clientWidth / canvas.clientHeight;
 			camera.updateProjectionMatrix();
-
 		}
 
-		objects.forEach( ( obj ) => {
-
+		objects.forEach((obj) => {
 			obj.rotation.y = time;
+		});
 
-		} );
-
-		renderer.render( scene, camera );
-
-		requestAnimationFrame( render );
-
+		renderer.render(scene, camera);
+		requestAnimationFrame(render);
 	}
 
-	requestAnimationFrame( render );
+	requestAnimationFrame(render);
 }
 
 main()
