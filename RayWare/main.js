@@ -2,9 +2,12 @@ import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 
 var canvas, /*场景*/ scene, /*相机*/ camera, /*渲染器*/ renderer, /*手势控制*/ controls, /*环境光*/ ambient;
-var width = 1920; //窗口宽度
-var height = 1080; //窗口高度
-var k = width / height; //窗口宽高比
+var mesh;
+
+// 鼠标拖动旋转视角
+let mouseDown = false;
+let prevMouseX = 0;
+let prevMouseY = 0;
 
 /**创建场景对象Scene*/
 function initScene() {
@@ -15,7 +18,6 @@ function initScene() {
 function initCamera() {
     var s = 150; //三维场景显示范围控制系数，系数越大，显示的范围越大
     //创建相机对象
-    // camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000);
     const fov = 40;
 	const aspect = 2; // the canvas default
 	const near = 0.1;
@@ -33,6 +35,30 @@ function initLights() {
     //环境光
     ambient = new THREE.AmbientLight(0x444444);
     scene.add(ambient);
+}
+
+function onMouseDown(event) {
+    mouseDown = true;
+    prevMouseX = event.clientX;
+    prevMouseY = event.clientY;
+}
+
+function onMouseUp(event) {
+    mouseDown = false;
+}
+
+function onMouseMove(event) {
+    if (mouseDown) {
+        const deltaX = event.clientX - prevMouseX;
+        const deltaY = event.clientY - prevMouseY;
+
+        // camera.rotation.x += deltaX * 0.01;
+        camera.rotation.z += deltaY * 0.01;
+        // camera.rotation.y += deltaX * 0.01;
+
+        prevMouseX = event.clientX;
+        prevMouseY = event.clientY;
+    }
 }
 
 /**创建渲染器对象*/
@@ -57,13 +83,12 @@ function initCube() {
 function loadSTLTestFile() {
     const loader = new STLLoader();
     loader.load('models/yachi.stl', function(geometry){
-        // const material = new THREE.MeshPhongMaterial( { color: 0xff9c7c, side: THREE.DoubleSide, specular: 0x494949, shininess: 12 } );
         const material = new THREE.MeshLambertMaterial({color: 0x0000ff});
-        const mesh = new THREE.Mesh( geometry, material );
+        mesh = new THREE.Mesh( geometry, material );
 
         mesh.position.set( 0, - 0.25, 0.6 );
-        mesh.rotation.set( 0, Math.PI*2, 0 );
-        mesh.rotation.set(Math.PI, 0, 0);
+        // mesh.rotation.set( 0, Math.PI*2, 0 );
+        mesh.rotation.set(Math.PI, Math.PI/2, 0);
         mesh.scale.set( 0.5, 0.5, 0.5 );
 
         mesh.castShadow = true;
@@ -110,8 +135,14 @@ function main() {
 
     helpers();
 
+    document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mouseup', onMouseUp, false);
+    document.addEventListener('mousemove', onMouseMove, false);
+
     loadSTLTestFile();
     render();
 }
 
 main();
+
+
